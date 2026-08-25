@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ranique Label Stamper — Brand Every Shipment</title>
+  <meta name="description" content="Instantly stamp your store branding and QR code onto Meesho shipping labels. Free, local, no account needed." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+
+  <!-- ─── Mesh background ─────────────────────────────────────────────── -->
+  <div class="mesh-bg" aria-hidden="true">
+    <div class="mesh-orb orb-1"></div>
+    <div class="mesh-orb orb-2"></div>
+    <div class="mesh-orb orb-3"></div>
+    <div class="mesh-grid"></div>
+  </div>
+
+  <!-- ─── Header ──────────────────────────────────────────────────────── -->
+  <header class="header" role="banner">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+            <path d="M7 21H3a1 1 0 01-1-1V8l5-5h12a1 1 0 011 1v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="11" y="13" width="10" height="8" rx="1" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M11 17h10M15 13v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-name">ranique<span class="brand-accent">lifestyle</span></span>
+          <span class="brand-tagline">Store Toolkit</span>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs" role="tablist" aria-label="Software Tools">
+        <button class="nav-tab active" id="tab-stamper" role="tab" aria-selected="true" aria-controls="panel-stamper" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tab-icon"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82zM7 7h.01"/></svg>
+          Label Stamper
+        </button>
+        <button class="nav-tab" id="tab-verifier" role="tab" aria-selected="false" aria-controls="panel-verifier" type="button">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tab-icon"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Address Verifier
+        </button>
+      </nav>
+
+      <div class="header-badges">
+        <span class="badge badge-live">
+          <span class="live-dot" aria-hidden="true"></span>
+          Live Toolkit
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- ─── Hero ─────────────────────────────────────────────────────────── -->
+  <section class="hero" id="hero-stamper" aria-labelledby="hero-title">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-eyebrow">
+          <span class="eyebrow-dot" aria-hidden="true"></span>
+          Meesho Label Branding Tool
+        </div>
+        <h1 class="hero-title" id="hero-title">
+          Stamp Your<br>
+          <span class="title-gradient">Brand Identity</span><br>
+          on Every Shipment
+        </h1>
+        <p class="hero-desc">
+          Upload your Meesho PDF label, add your store link — we stamp your
+          shop icon, name, and a scannable QR code into the free space.
+          <strong>Original label stays 100% intact.</strong>
+        </p>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-val">~1s</span>
+            <span class="stat-label">Processing time</span>
+          </div>
+          <div class="stat-div" aria-hidden="true"></div>
+          <div class="stat">
+            <span class="stat-val">0</span>
+            <span class="stat-label">Data sent online</span>
+          </div>
+          <div class="stat-div" aria-hidden="true"></div>
+          <div class="stat">
+            <span class="stat-val">Free</span>
+            <span class="stat-label">Forever</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Animated label preview -->
+      <div class="hero-visual" aria-hidden="true">
+        <div class="label-preview">
+          <div class="label-badge">Meesho Label PDF</div>
+          <div class="lp-shipping">
+            <div class="lp-row">
+              <div class="lp-block">
+                <div class="lp-line bold w-70"></div>
+                <div class="lp-line w-90"></div>
+                <div class="lp-line w-80"></div>
+                <div class="lp-line w-60"></div>
+              </div>
+              <div class="lp-block lp-block-right">
+                <div class="lp-barcode-label">Pickup</div>
+                <div class="lp-barcode"></div>
+                <div class="lp-line w-80" style="margin-top:6px"></div>
+              </div>
+            </div>
+          </div>
+          <div class="lp-invoice">
+            <div class="lp-line w-40 bold"></div>
+            <div class="lp-line w-100"></div>
+            <div class="lp-line w-90"></div>
+            <div class="lp-line w-80"></div>
+            <div class="lp-line w-95"></div>
+          </div>
+          <!-- The stamped strip -->
+          <div class="lp-strip">
+            <div class="lp-strip-icon">
+              <div class="si-awning"></div>
+              <div class="si-body">
+                <div class="si-door"></div>
+              </div>
+            </div>
+            <div class="lp-strip-divider"></div>
+            <div class="lp-strip-name">
+              <div class="lp-store-name">RANIQUE LIFESTYLE</div>
+              <div class="lp-name-underline"></div>
+            </div>
+            <div class="lp-strip-divider"></div>
+            <div class="lp-strip-qr">
+              <div class="lp-qr">
+                <div class="qr-pattern"></div>
+              </div>
+              <div class="lp-qr-text">
+                <span>Follow</span>
+                <span>our shop</span>
+              </div>
+            </div>
+          </div>
+          <div class="stamp-badge">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Branding stamped
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Hero Verifier ────────────────────────────────────────────────── -->
+  <section class="hero hidden" id="hero-verifier" aria-labelledby="hero-verifier-title">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <div class="hero-eyebrow">
+          <span class="eyebrow-dot" aria-hidden="true"></span>
+          Shipping Address Quality Control
+        </div>
+        <h1 class="hero-title" id="hero-verifier-title">
+          Verify Shipping<br>
+          <span class="title-gradient">Addresses Instantly</span><br>
+          Before Dispatch
+        </h1>
+        <p class="hero-desc">
+          Ensure delivery success. Paste any Indian delivery address to instantly cross-reference its 6-digit PIN code with official postal databases. Automatically catch mismatches, missing states, and verify on Google Maps.
+        </p>
+        <div class="hero-stats">
+          <div class="stat">
+            <span class="stat-val">PIN lookup</span>
+            <span class="stat-label">Official Database</span>
+          </div>
+          <div class="stat-div" aria-hidden="true"></div>
+          <div class="stat">
+            <span class="stat-val">Autocorrect</span>
+            <span class="stat-label">Smart Suggestions</span>
+          </div>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="label-preview" style="padding: 24px; min-height: 200px; display: flex; flex-direction: column; justify-content: center; gap: 12px; background: rgba(16,19,35,0.75);">
+          <div style="font-size: 11px; font-weight: 700; color: var(--gold-1); text-transform: uppercase; letter-spacing: 0.5px;">Address Verifier Engine</div>
+          <div style="font-family: var(--mono); font-size: 12px; color: var(--t2); background: var(--bg-base); padding: 12px; border-radius: 8px; border: 1px solid var(--b1);">
+            Renuka randhire, Hattur, Solapur, Maharashtra - 413008
+          </div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 10px; background: var(--success-bg); color: var(--success); padding: 2px 8px; border-radius: 99px; font-weight: 600; border: 1px solid rgba(13,217,160,0.2);">✓ Valid PIN</span>
+            <span style="font-size: 10px; background: var(--success-bg); color: var(--success); padding: 2px 8px; border-radius: 99px; font-weight: 600; border: 1px solid rgba(13,217,160,0.2);">✓ State Match</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─── Steps bar (Label Stamper) ────────────────────────────────────── -->
+  <div class="steps-bar" id="steps-stamper" role="list" aria-label="Label Stamper Steps">
+    <div class="steps-inner">
+      <div class="step-item" role="listitem">
+        <div class="step-num" aria-hidden="true">1</div>
+        <div class="step-text">
+          <span class="step-title">Upload PDF</span>
+          <span class="step-sub">Your Meesho label</span>
+        </div>
+      </div>
+      <div class="step-connector" aria-hidden="true">
+        <div class="connector-line"></div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="step-item" role="listitem">
+        <div class="step-num" aria-hidden="true">2</div>
+        <div class="step-text">
+          <span class="step-title">Your Details</span>
+          <span class="step-sub">Name + store link</span>
+        </div>
+      </div>
+      <div class="step-connector" aria-hidden="true">
+        <div class="connector-line"></div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="step-item" role="listitem">
+        <div class="step-num" aria-hidden="true">3</div>
+        <div class="step-text">
+          <span class="step-title">Download</span>
+          <span class="step-sub">Branded label PDF</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Steps bar (Address Verifier) ─────────────────────────────────── -->
+  <div class="steps-bar hidden" id="steps-verifier" role="list" aria-label="Address Verifier Steps">
+    <div class="steps-inner">
+      <div class="step-item" role="listitem">
+        <div class="step-num" aria-hidden="true">1</div>
+        <div class="step-text">
+          <span class="step-title">Paste Address</span>
+          <span class="step-sub">Enter shipping text</span>
+        </div>
+      </div>
+      <div class="step-connector" aria-hidden="true">
+        <div class="connector-line"></div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="step-item" role="listitem">
+        <div class="step-num" aria-hidden="true">2</div>
+        <div class="step-text">
+          <span class="step-title">Database Check</span>
+          <span class="step-sub">Automatic PIN verification</span>
+        </div>
+      </div>
+      <div class="step-connector" aria-hidden="true">
+        <div class="connector-line"></div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="step-item" role="listitem">
+        <div class="step-num" aria-hidden="true">3</div>
+        <div class="step-text">
+          <span class="step-title">Confirm Delivery</span>
+          <span class="step-sub">Verify maps &amp; proceed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── Main forms ───────────────────────────────────────────────────── -->
+  <main class="main" id="main-form">
+    
+    <!-- 1. LABEL STAMPER PANEL -->
+    <div class="panel-view" id="panel-stamper" role="tabpanel" aria-labelledby="tab-stamper">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; align-items: start;">
+        
+        <!-- Left Column: Settings and inputs -->
+        <div>
+          <div class="form-card">
+            <!-- Upload section -->
+            <div class="form-section" id="sec-upload">
+              <div class="section-head">
+                <div class="section-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 2v6h6M12 12v6M9 15l3-3 3 3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div>
+                  <h2 class="section-title">Upload Meesho Label</h2>
+                  <p class="section-desc">PDF file from Meesho, Shiprocket, or any courier partner</p>
+                </div>
+                <span class="section-badge">Step 1</span>
+              </div>
+
+              <div class="upload-zone" id="upload-zone" role="button" tabindex="0" aria-label="Upload Meesho PDF label">
+                <div class="uz-idle" id="uz-idle">
+                  <div class="uz-icon" aria-hidden="true">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none">
+                      <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <polyline points="17 8 12 3 7 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                      <line x1="12" y1="3" x2="12" y2="15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <p class="uz-primary">Drop your Meesho PDF here</p>
+                  <p class="uz-secondary">or <span class="uz-link">browse files</span></p>
+                  <p class="uz-hint">PDF only · up to 30 MB</p>
+                </div>
+                <div class="uz-ready hidden" id="uz-ready">
+                  <div class="uz-ready-icon" aria-hidden="true">
+                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                  </div>
+                  <p class="uz-filename" id="uz-filename"></p>
+                  <button class="btn-inline" id="btn-change" type="button">Change file</button>
+                </div>
+                <input type="file" id="file-input" accept=".pdf" hidden aria-hidden="true" />
+              </div>
+            </div>
+
+            <!-- Divider -->
+            <div class="form-divider" aria-hidden="true"></div>
+
+            <!-- Store details section -->
+            <div class="form-section" id="sec-details">
+              <div class="section-head">
+                <div class="section-icon" aria-hidden="true">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="9 22 9 12 15 12 15 22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </div>
+                <div>
+                  <h2 class="section-title">Store Details</h2>
+                  <p class="section-desc">Appears in the branding strip on your label</p>
+                </div>
+                <span class="section-badge">Step 2</span>
+              </div>
+
+              <div class="fields">
+                <div class="field" id="field-name">
+                  <label class="field-label" for="inp-name">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M8 21h8M12 17v4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                    Store Name
+                  </label>
+                  <input class="field-input" type="text" id="inp-name"
+                         value="RANIQUE LIFESTYLE" maxlength="40"
+                         placeholder="e.g. RANIQUE LIFESTYLE" autocomplete="organization" />
+                  <span class="field-hint">Shown bold in the centre of the strip</span>
+                </div>
+
+                <div class="field" id="field-link">
+                  <label class="field-label" for="inp-link">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    Store Link
+                    <span class="required-star" aria-label="required">*</span>
+                  </label>
+                  <input class="field-input mono" type="url" id="inp-link"
+                         placeholder="https://instagram.com/raniquelifestyle"
+                         autocomplete="url" />
+                  <span class="field-hint">This URL is encoded in the QR code</span>
+
+                  <div class="presets" role="group" aria-label="Quick-fill store link">
+                    <span class="presets-label">Quick fill:</span>
+                    <button class="preset" data-prefix="https://instagram.com/" type="button">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="2"/><path d="M16 11.37A4 4 0 1112.63 8 4 4 0 0116 11.37z" stroke="currentColor" stroke-width="2"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+                      Instagram
+                    </button>
+                    <button class="preset" data-prefix="https://wa.me/91" type="button">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      WhatsApp
+                    </button>
+                    <button class="preset" data-prefix="https://meesho.com/supplier/" type="button">
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 10a4 4 0 01-8 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                      Meesho
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Resize to 4x6 option -->
+                <div class="field" id="field-convert" style="margin-top: 10px; border-top: 1px dashed var(--b1); padding-top: 18px;">
+                  <label class="field-label" style="display: flex; align-items: center; gap: 8px; cursor: pointer; text-transform: none; font-weight: 600; font-size: 13.5px; color: var(--t1);">
+                    <input type="checkbox" id="inp-convert-4x6" style="width: 17px; height: 17px; accent-color: var(--gold-1); cursor: pointer;" />
+                    Resize PDF pages to standard 4"x6" label size (for thermal printers)
+                  </label>
+                  <span class="field-hint" style="margin-left: 25px;">Auto-scales and fits oversized or A4 layout pages to exactly 288x432 points for print layout compatibility.</span>
+                </div>
+
+              </div>
+            </div>
+
+            <!-- CTA -->
+            <div class="form-cta">
+              <button class="btn-stamp" id="btn-stamp" type="button" disabled>
+                <span class="btn-stamp-icon" aria-hidden="true">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </span>
+                <span id="stamp-label">Stamp &amp; Preview Label</span>
+              </button>
+              <p class="cta-note">
+                Generates a live PDF preview instantly before saving
+              </p>
+            </div>
+          </div>
+
+          <!-- Success state with two actions: Preview & Download -->
+          <div class="success-card hidden" id="success-card" role="alert" aria-live="polite" style="margin-top: 20px;">
+            <div class="success-left" style="width: 100%; margin-bottom: 12px; display: flex; align-items: center; gap: 12px;">
+              <div class="success-check" aria-hidden="true" style="width: 42px; height: 42px; border-radius: 50%; background: var(--success-bg); border: 1px solid rgba(12,176,130,0.3); color: var(--success); display: flex; align-items: center; justify-content: center;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 5 12"/></svg>
+              </div>
+              <div>
+                <p class="success-title" style="color: var(--success); font-weight: 700; margin: 0;">Branding Stamped successfully!</p>
+                <p class="success-sub" style="font-size: 12.5px; color: var(--t2); margin-top: 2px;">Review the preview on the right and download your PDF label.</p>
+              </div>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; width: 100%;">
+              <button id="btn-download-pdf" class="btn-stamp" style="padding: 10px 18px; font-size: 13.5px; flex: 1; min-width: 140px; margin: 0; box-shadow: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px;" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                Download PDF
+              </button>
+              <button id="btn-tab-preview" class="btn-another" style="flex: 1; min-width: 140px; border-color: var(--b-gold); color: var(--gold-1); display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 18px;" type="button">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+                Fullscreen View
+              </button>
+              <button class="btn-another" id="btn-another" style="padding: 10px 18px;" type="button">Reset</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Interactive Live PDF Preview Card -->
+        <div class="form-card" style="align-self: stretch; display: flex; flex-direction: column;">
+          <div class="form-section" style="padding: 24px; flex: 1; display: flex; flex-direction: column; min-height: 520px;">
+            <div class="section-head" style="margin-bottom: 16px;">
+              <div class="section-icon" aria-hidden="true" style="color: var(--gold-1); background: var(--gold-dim); border: 1px solid var(--b-gold);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </div>
+              <div>
+                <h3 class="section-title">Live Stamped Preview</h3>
+                <p class="section-desc">Verify your branded print layout page-by-page</p>
+              </div>
+            </div>
+
+            <!-- Preview Frame / Placeholder -->
+            <div id="stamper-preview-container" style="flex: 1; background: rgba(0,0,0,0.02); border: 1px dashed var(--b1); border-radius: var(--r-lg); display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative; min-height: 400px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.02);">
+              <div id="stamper-preview-placeholder" style="text-align: center; padding: 24px; color: var(--t3);">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom: 12px; color: var(--t4);"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                <p style="font-size: 13.5px; font-weight: 700; color: var(--t2);">No Label Stamped Yet</p>
+                <p style="font-size: 11.5px; margin-top: 4px; max-width: 240px; margin-left: auto; margin-right: auto; line-height: 1.4;">Configure settings on the left and click Stamp to generate a real PDF layout preview.</p>
+              </div>
+              <iframe id="stamper-pdf-iframe" class="hidden" style="width: 100%; height: 100%; border: none; border-radius: var(--r-md);" src=""></iframe>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 2. ADDRESS VERIFIER PANEL -->
+    <div class="panel-view hidden" id="panel-verifier" role="tabpanel" aria-labelledby="tab-verifier">
+      <div class="form-card">
+        <div class="form-section">
+          <div class="section-head">
+            <div class="section-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="10" r="3" stroke="currentColor" stroke-width="1.8"/></svg>
+            </div>
+            <div>
+              <h2 class="section-title">Verify Shipping Address</h2>
+              <p class="section-desc">Paste address text or drop shipping label file (PDF, Screenshot, PNG, JPG) to parse &amp; verify</p>
+            </div>
+            <span class="section-badge">Step 1</span>
+          </div>
+
+          <!-- Split Input Area: Paste Text or Upload File -->
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+            
+            <!-- Paste address field -->
+            <div class="field">
+              <label class="field-label" for="inp-address">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="currentColor" stroke-width="2"/><path d="M14 2v6h6M16 13H8M16 17H8" stroke="currentColor" stroke-width="2"/></svg>
+                Paste Address Text
+              </label>
+              <textarea class="field-input" id="inp-address" rows="5" 
+                        placeholder="Paste recipient address here (e.g. Renuka randhire, Hattur, Solapur, Maharashtra, 413008)"></textarea>
+            </div>
+
+            <!-- Drop label file field -->
+            <div class="field">
+              <label class="field-label">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke="currentColor" stroke-width="2"/></svg>
+                Or Drop Label / Screenshot File
+              </label>
+              <div class="upload-zone" id="verifier-dropzone" style="min-height: 122px;" role="button" tabindex="0" aria-label="Drop label file or image">
+                <div class="uz-idle" id="vd-idle">
+                  <p class="uz-primary" style="font-size: 13px;">Drop PDF, PNG, JPG or Screenshot</p>
+                  <p class="uz-secondary" style="font-size: 11px;">or <span class="uz-link">browse files</span></p>
+                </div>
+                <div class="uz-ready hidden" id="vd-ready">
+                  <p class="uz-filename" id="vd-filename" style="font-size: 12px; color: var(--success); font-weight: 600;"></p>
+                  <button class="btn-inline" id="btn-change-verifier-file" type="button" style="padding: 2px 8px; font-size: 11px;">Change</button>
+                </div>
+                <input type="file" id="verifier-file-input" accept=".pdf,image/*" multiple hidden aria-hidden="true" />
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="form-cta">
+          <button class="btn-stamp" id="btn-verify" type="button">
+            <span class="btn-stamp-icon" aria-hidden="true">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M22 11.08V12a10 10 0 11-5.93-9.14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><polyline points="22 4 12 14.01 9 11.01" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+            Verify Address Batch
+          </button>
+        </div>
+      </div>
+
+      <!-- Address Verification Results Card -->
+      <div class="form-card hidden" id="card-verify-results" style="margin-top: 24px; border: 1.5px solid var(--b2); max-width: 100%;">
+        <div class="form-section" style="padding: 24px;">
+          
+          <div class="section-head" style="margin-bottom: 20px; border-bottom: 1px solid var(--b1); padding-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+            <div style="display: flex; align-items: center;">
+              <div id="verify-status-badge" class="badge badge-live" style="padding: 4px 12px; font-size: 12px;">Batch Complete</div>
+              <h3 class="section-title" style="font-size: 16px; margin-left: 10px; margin-bottom: 0;">Address Quality Dashboard</h3>
+            </div>
+            <div style="display: flex; gap: 8px;">
+              <span id="batch-total-badge" class="badge" style="background: var(--bg-4); color: var(--t1); border: 1px solid var(--b1);">0 Labels Verified</span>
+              <span id="batch-pass-badge" class="badge" style="background: var(--success-bg); color: var(--success); border: 1px solid rgba(13,217,160,0.2);">0 Safe</span>
+              <span id="batch-fail-badge" class="badge" style="background: var(--error-bg); color: var(--error); border: 1px solid rgba(255,92,124,0.2);">0 Warning/Fail</span>
+            </div>
+          </div>
+
+          <!-- Structured Verification Table -->
+          <div style="width: 100%; overflow-x: auto; margin-bottom: 24px; border-radius: var(--r-md); border: 1px solid var(--b1);">
+            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+              <thead>
+                <tr style="background: rgba(255,255,255,0.02); border-bottom: 1px solid var(--b1);">
+                  <th style="padding: 12px 16px; color: var(--t3); font-weight: 700; text-transform: uppercase; font-size: 11px;">Source File / Input</th>
+                  <th style="padding: 12px 16px; color: var(--t3); font-weight: 700; text-transform: uppercase; font-size: 11px; min-width: 160px;">Customer Address</th>
+                  <th style="padding: 12px 16px; color: var(--t3); font-weight: 700; text-transform: uppercase; font-size: 11px;">PIN Status</th>
+                  <th style="padding: 12px 16px; color: var(--t3); font-weight: 700; text-transform: uppercase; font-size: 11px;">State/District Matches</th>
+                  <th style="padding: 12px 16px; color: var(--t3); font-weight: 700; text-transform: uppercase; font-size: 11px;">Hub &amp; Courier</th>
+                  <th style="padding: 12px 16px; color: var(--t3); font-weight: 700; text-transform: uppercase; font-size: 11px; min-width: 180px;">Shipping Recommendation</th>
+                  <th style="padding: 12px 16px; color: var(--t3); font-weight: 700; text-transform: uppercase; font-size: 11px; min-width: 250px;">Validation Reason / Explanation</th>
+                </tr>
+              </thead>
+              <tbody id="verifier-batch-tbody" style="color: var(--t1);">
+                <!-- Dynamic Rows will go here -->
+              </tbody>
+            </table>
+          </div>
+
+          <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+            <button id="btn-copy-all-passed" class="preset" style="padding: 8px 16px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
+              Copy All Safe Addresses
+            </button>
+            <button id="btn-reset-verifier" class="preset" style="padding: 8px 16px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px;" type="button">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+              Verify Another Batch
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Error toast -->
+    <div class="toast hidden" id="toast" role="alert" aria-live="assertive">
+      <svg class="toast-icon" width="18" height="18" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/><line x1="12" y1="8" x2="12" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="12" y1="16" x2="12.01" y2="16" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      <span id="toast-msg"></span>
+      <button class="toast-close" id="toast-close" type="button" aria-label="Close">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><line x1="18" y1="6" x2="6" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </main>
+
+
+  <!-- ─── Loading overlay ──────────────────────────────────────────────── -->
+  <div class="loading-overlay hidden" id="loading" role="status" aria-live="polite" aria-label="Stamping label">
+    <div class="loading-card">
+      <div class="loading-ring" aria-hidden="true">
+        <div class="ring-inner"></div>
+      </div>
+      <p class="loading-title">Stamping your label…</p>
+      <p class="loading-sub">Generating QR + adding branding strip</p>
+    </div>
+  </div>
+
+  <!-- ─── Footer ──────────────────────────────────────────────────────── -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-inner">
+      <span>Built for <strong>Ranique Lifestyle</strong></span>
+      <span class="footer-dot" aria-hidden="true">·</span>
+      <span>Runs 100% locally · No data leaves your machine</span>
+      <span class="footer-dot" aria-hidden="true">·</span>
+      <span>Free &amp; open source</span>
+    </div>
+  </footer>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
