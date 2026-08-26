@@ -74,31 +74,61 @@ def api_verify_address():
       - JSON body: { "address": "..." }
       - Multipart form-data: upload a file (PDF, PNG, JPG)
     Extracts text, isolates shipping address + courier hub, and verifies it.
+    Returns a list of verification reports (one report per page for PDFs).
     """
     from address_verifier import (
         verify_indian_address, 
-        extract_text_from_pdf, 
         run_local_ocr, 
         extract_address_and_hub
     )
-
-    address_to_verify = ""
-    extracted_text = ""
-    delivery_hub = "Standard Delivery Hub"
-    courier_name = "Standard Courier"
-    file_used = False
+    import pymupdf as fitz
 
     # A. Check for file upload
     if 'file' in request.files:
         file = request.files['file']
         if file.filename:
-            file_used = True
             filename = file.filename.lower()
             
             if filename.endswith('.pdf'):
-                # PDF Text Extraction
                 pdf_bytes = file.read()
-                extracted_text = extract_text_from_pdf(pdf_bytes)
+                reports = []
+                try:
+                    doc = fitz.open(stream=pdf_bytes, filetype="pdf")
+                    if len(doc) == 0:
+                        return jsonify({'error': 'The uploaded PDF has no pages.'}), 400
+                    
+                    for page_num, page in enumerate(doc):
+                        page_text = page.get_text() or ""
+                        # If page text is completely empty (scanned image PDF page)
+                        if not page_text.strip():
+                            log.info("Page %d has no vector text. Attempting OCR...", page_num + 1)
+                            os.makedirs('temp', exist_ok=True)
+                            temp_path = os.path.join('temp', f"ocr_page_{page_num}_{file.filename}.png")
+                            try:
+                                pix = page.get_pixmap(dpi=150)
+                                pix.save(temp_path)
+                                page_text = run_local_ocr(temp_path)
+                            except Exception as ocr_err:
+                                log.error("OCR rendering/processing failed for page %d: %s", page_num + 1, ocr_err)
+                            finally:
+                                if os.path.exists(temp_path):
+                                    os.remove(temp_path)
+
+                        address_to_verify, delivery_hub, courier_name = extract_address_and_hub(page_text)
+                        
+                        # Verify this specific address
+                        report = verify_indian_address(address_to_verify)
+                        report['file_used'] = True
+                        report['extracted_text'] = page_text
+                        report['delivery_hub'] = delivery_hub
+                        report['courier_name'] = courier_name
+                        reports.append(report)
+                        
+                    return jsonify(reports)
+                except Exception as doc_err:
+                    log.exception("Failed to parse PDF document")
+                    return jsonify({'error': f'Failed to parse PDF document: {doc_err}'}), 500
+            
             elif filename.endswith(('.png', '.jpg', '.jpeg')):
                 # Image local OCR using Windows Engine
                 os.makedirs('temp', exist_ok=True)
@@ -106,18 +136,21 @@ def api_verify_address():
                 file.save(temp_path)
                 try:
                     extracted_text = run_local_ocr(temp_path)
+                    address_to_verify, delivery_hub, courier_name = extract_address_and_hub(extracted_text)
+                    report = verify_indian_address(address_to_verify)
+                    report['file_used'] = True
+                    report['extracted_text'] = extracted_text
+                    report['delivery_hub'] = delivery_hub
+                    report['courier_name'] = courier_name
+                    return jsonify([report])  # Return as list of size 1
+                except Exception as img_err:
+                    log.exception("Image OCR process failed")
+                    return jsonify({'error': f'Failed to process image: {img_err}'}), 500
                 finally:
                     if os.path.exists(temp_path):
                         os.remove(temp_path)
             else:
                 return jsonify({'error': 'Unsupported file type. Upload PDF, PNG, or JPG.'}), 400
-
-            # Parse extracted text for address and routing info
-            address_to_verify, delivery_hub, courier_name = extract_address_and_hub(extracted_text)
-            if not address_to_verify.strip():
-                return jsonify({
-                    'error': 'Could not extract any readable address text from the uploaded document.'
-                }), 400
     else:
         # B. Check for JSON input
         data = request.get_json() or {}
@@ -125,17 +158,16 @@ def api_verify_address():
         if not address_to_verify:
             return jsonify({'error': 'Please provide an address or upload a label file.'}), 400
 
-    try:
-        report = verify_indian_address(address_to_verify)
-        # Enrich report with parsing info if file was uploaded
-        report['file_used'] = file_used
-        report['extracted_text'] = extracted_text
-        report['delivery_hub'] = delivery_hub
-        report['courier_name'] = courier_name
-        return jsonify(report)
-    except Exception as exc:
-        log.exception('Address verification failed')
-        return jsonify({'error': f'Verification failed: {exc}'}), 500
+        try:
+            report = verify_indian_address(address_to_verify)
+            report['file_used'] = False
+            report['extracted_text'] = address_to_verify
+            report['delivery_hub'] = "Standard Delivery Hub"
+            report['courier_name'] = "Standard Courier"
+            return jsonify([report])  # Return as list of size 1
+        except Exception as exc:
+            log.exception('Address verification failed')
+            return jsonify({'error': f'Verification failed: {exc}'}), 500
 
 
 if __name__ == '__main__':

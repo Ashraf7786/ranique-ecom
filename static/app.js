@@ -336,7 +336,6 @@ btnVerify.addEventListener('click', async () => {
   try {
     if (verifierFiles.length > 0) {
       // A. Bulk Files Verification
-      totalCount = verifierFiles.length;
       for (let i = 0; i < verifierFiles.length; i++) {
         const file = verifierFiles[i];
         
@@ -357,26 +356,34 @@ btnVerify.addEventListener('click', async () => {
             const err = await res.json().catch(() => ({}));
             appendErrorRow(file.name, err.error || `Server error ${res.status}`);
             failCount++;
+            totalCount++;
             continue;
           }
 
           const data = await res.json();
-          appendResultRow(file.name, data);
+          const reports = Array.isArray(data) ? data : [data];
           
-          if (data.recommendation === 'shipped_parcel' || data.recommendation === 'low_risk_shipped') {
-            passCount++;
-            verifiedAddresses.push(data.suggested_address || data.raw_address);
-          } else {
-            failCount++;
+          for (let pageIdx = 0; pageIdx < reports.length; pageIdx++) {
+            const report = reports[pageIdx];
+            const displayName = reports.length > 1 ? `${file.name} (Page ${pageIdx + 1})` : file.name;
+            appendResultRow(displayName, report);
+            
+            totalCount++;
+            if (report.recommendation === 'shipped_parcel' || report.recommendation === 'low_risk_shipped') {
+              passCount++;
+              verifiedAddresses.push(report.suggested_address || report.raw_address);
+            } else {
+              failCount++;
+            }
           }
         } catch (err) {
           appendErrorRow(file.name, err.message);
           failCount++;
+          totalCount++;
         }
       }
     } else {
       // B. Single Pasted Text Verification
-      totalCount = 1;
       loadingTitle.textContent = "Verifying address…";
       loadingSub.textContent = "Checking details with Indian Post database";
 
@@ -391,19 +398,29 @@ btnVerify.addEventListener('click', async () => {
           const err = await res.json().catch(() => ({}));
           appendErrorRow("Pasted Text Input", err.error || `Server error ${res.status}`);
           failCount++;
+          totalCount++;
         } else {
           const data = await res.json();
-          appendResultRow("Pasted Text Input", data);
-          if (data.recommendation === 'shipped_parcel' || data.recommendation === 'low_risk_shipped') {
-            passCount++;
-            verifiedAddresses.push(data.suggested_address || data.raw_address);
-          } else {
-            failCount++;
+          const reports = Array.isArray(data) ? data : [data];
+          
+          for (let pageIdx = 0; pageIdx < reports.length; pageIdx++) {
+            const report = reports[pageIdx];
+            const displayName = reports.length > 1 ? `Pasted Text Input (Page ${pageIdx + 1})` : "Pasted Text Input";
+            appendResultRow(displayName, report);
+            
+            totalCount++;
+            if (report.recommendation === 'shipped_parcel' || report.recommendation === 'low_risk_shipped') {
+              passCount++;
+              verifiedAddresses.push(report.suggested_address || report.raw_address);
+            } else {
+              failCount++;
+            }
           }
         }
       } catch (err) {
         appendErrorRow("Pasted Text Input", err.message);
         failCount++;
+        totalCount++;
       }
     }
 
