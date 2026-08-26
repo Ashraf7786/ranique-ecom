@@ -105,7 +105,7 @@ function clearFile() {
 
 uploadZone.addEventListener('click', e => {
   if (e.target === btnChange || btnChange.contains(e.target)) return;
-  if (!selectedFile) fileInput.click();
+  fileInput.click();
 });
 uploadZone.addEventListener('keydown', e => {
   if ((e.key === 'Enter' || e.key === ' ') && !selectedFile) {
@@ -237,6 +237,36 @@ btnAnother.addEventListener('click', () => {
 });
 
 
+// Helper to count PDF pages offline by searching the binary structure
+function getPdfPageCount(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const arr = new Uint8Array(e.target.result);
+      const text = new TextDecoder('ascii').decode(arr.subarray(0, Math.min(arr.length, 10 * 1024 * 1024)));
+      const matches = text.match(/\/Type\s*\/Page\b/g);
+      if (matches) {
+        resolve(matches.length);
+      } else {
+        const countMatches = text.match(/\/Count\s+(\d+)/g);
+        if (countMatches) {
+          let maxCount = 1;
+          countMatches.forEach(m => {
+            const num = parseInt(m.replace(/[^\d]/g, ''), 10);
+            if (num > maxCount) maxCount = num;
+          });
+          resolve(maxCount);
+        } else {
+          resolve(1);
+        }
+      }
+    };
+    reader.onerror = () => resolve(1);
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+
 // ── Address Verifier Logic ──────────────────────────────────────────────────
 const inpAddress           = $('inp-address');
 const btnVerify            = $('btn-verify');
@@ -267,7 +297,7 @@ let verifiedAddresses = []; // to cache correct addresses for batch copying
 // File Input events
 verifierDropzone.addEventListener('click', e => {
   if (e.target === btnChangeVerifierFile || btnChangeVerifierFile.contains(e.target)) return;
-  if (verifierFiles.length === 0) verifierFileInput.click();
+  verifierFileInput.click();
 });
 verifierFileInput.addEventListener('change', e => {
   if (e.target.files && e.target.files.length > 0) {
@@ -337,50 +367,78 @@ btnVerify.addEventListener('click', async () => {
   try {
     if (verifierFiles.length > 0) {
       // A. Bulk Files Verification
+      
+      // Calculate total page counts for all files first
+      const filePageCounts = [];
+      let totalPagesInBatch = 0;
       for (let i = 0; i < verifierFiles.length; i++) {
         const file = verifierFiles[i];
+        if (file.name.toLowerCase().endsWith('.pdf')) {
+          const pages = await getPdfPageCount(file);
+          filePageCounts.push(pages);
+          totalPagesInBatch += pages;
+        } else {
+          filePageCounts.push(1);
+          totalPagesInBatch += 1;
+        }
+      }
+
+      let processedPagesCount = 0;
+
+      for (let i = 0; i < verifierFiles.length; i++) {
+        const file = verifierFiles[i];
+        const pageCount = filePageCounts[i];
         
-        // Update loading progress message
-        loadingTitle.textContent = `Verifying label ${i + 1} of ${verifierFiles.length}…`;
-        loadingSub.textContent = `Processing OCR & extraction on: ${file.name}`;
+        for (let pageIdx = 0; pageIdx < pageCount; pageIdx++) {
+          processedPagesCount++;
+          
+          // Update loading progress message live!
+          loadingTitle.textContent = `Verifying label ${processedPagesCount} of ${totalPagesInBatch}…`;
+          loadingSub.textContent = `Processing: ${file.name} ${pageCount > 1 ? `(Page ${pageIdx + 1})` : ''}`;
 
-        const fd = new FormData();
-        fd.append('file', file);
+          const fd = new FormData();
+          fd.append('file', file);
+          if (file.name.toLowerCase().endsWith('.pdf')) {
+            fd.append('page_num', pageIdx);
+          }
 
-        try {
-          const res = await fetch('/api/verify-address', {
-            method: 'POST',
-            body: fd
-          });
+          try {
+            const res = await fetch('/api/verify-address', {
+              method: 'POST',
+              body: fd
+            });
 
-          if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            appendErrorRow(file.name, err.error || `Server error ${res.status}`);
+            if (!res.ok) {
+              const err = await res.json().catch(() => ({}));
+              const displayName = pageCount > 1 ? `${file.name} (Page ${pageIdx + 1})` : file.name;
+              appendErrorRow(displayName, err.error || `Server error ${res.status}`);
+              failCount++;
+              totalCount++;
+              continue;
+            }
+
+            const data = await res.json();
+            const reports = Array.isArray(data) ? data : [data];
+            
+            for (let rIdx = 0; rIdx < reports.length; rIdx++) {
+              const report = reports[rIdx];
+              const displayName = pageCount > 1 ? `${file.name} (Page ${pageIdx + 1})` : file.name;
+              appendResultRow(displayName, report);
+              
+              totalCount++;
+              if (report.recommendation === 'shipped_parcel' || report.recommendation === 'low_risk_shipped') {
+                passCount++;
+                verifiedAddresses.push(report.suggested_address || report.raw_address);
+              } else {
+                failCount++;
+              }
+            }
+          } catch (err) {
+            const displayName = pageCount > 1 ? `${file.name} (Page ${pageIdx + 1})` : file.name;
+            appendErrorRow(displayName, err.message);
             failCount++;
             totalCount++;
-            continue;
           }
-
-          const data = await res.json();
-          const reports = Array.isArray(data) ? data : [data];
-          
-          for (let pageIdx = 0; pageIdx < reports.length; pageIdx++) {
-            const report = reports[pageIdx];
-            const displayName = reports.length > 1 ? `${file.name} (Page ${pageIdx + 1})` : file.name;
-            appendResultRow(displayName, report);
-            
-            totalCount++;
-            if (report.recommendation === 'shipped_parcel' || report.recommendation === 'low_risk_shipped') {
-              passCount++;
-              verifiedAddresses.push(report.suggested_address || report.raw_address);
-            } else {
-              failCount++;
-            }
-          }
-        } catch (err) {
-          appendErrorRow(file.name, err.message);
-          failCount++;
-          totalCount++;
         }
       }
     } else {

@@ -91,13 +91,22 @@ def api_verify_address():
             
             if filename.endswith('.pdf'):
                 pdf_bytes = file.read()
+                page_num_str = request.form.get('page_num')
                 reports = []
                 try:
                     doc = fitz.open(stream=pdf_bytes, filetype="pdf")
                     if len(doc) == 0:
                         return jsonify({'error': 'The uploaded PDF has no pages.'}), 400
                     
-                    for page_num, page in enumerate(doc):
+                    if page_num_str is not None:
+                        page_idx = int(page_num_str)
+                        if page_idx < 0 or page_idx >= len(doc):
+                            return jsonify({'error': f'Invalid page_num: {page_idx}'}), 400
+                        pages_to_process = [(page_idx, doc[page_idx])]
+                    else:
+                        pages_to_process = list(enumerate(doc))
+                    
+                    for page_num, page in pages_to_process:
                         page_text = page.get_text() or ""
                         # If page text is completely empty (scanned image PDF page)
                         if not page_text.strip():
