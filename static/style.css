@@ -797,6 +797,24 @@ body{
   transform: scale(1.1);
 }
 
+/* Interactive filter badges */
+.filter-badge {
+  cursor: pointer;
+  transition: var(--t);
+  user-select: none;
+}
+.filter-badge:hover {
+  transform: translateY(-1.5px);
+  filter: brightness(0.96);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+}
+.filter-badge:active {
+  transform: translateY(0);
+}
+.filter-badge.active-filter {
+  box-shadow: 0 0 0 2px var(--bg-1), 0 0 0 4px currentColor;
+}
+
 /* ── Utility ───────────────────────────────────────────────────── */
 .hidden{display:none!important}
 

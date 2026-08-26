@@ -324,6 +324,7 @@ btnVerify.addEventListener('click', async () => {
   loading.classList.remove('hidden');
   cardVerifyResults.classList.add('hidden');
   verifierBatchTbody.innerHTML = ''; // reset grid
+  applyFilter('all'); // reset active filter
 
   verifiedAddresses = [];
   let passCount = 0;
@@ -447,6 +448,7 @@ btnVerify.addEventListener('click', async () => {
 function appendResultRow(sourceName, data) {
   const tr = document.createElement('tr');
   tr.style.borderBottom = '1px solid var(--b1)';
+  tr.dataset.recommendation = data.recommendation; // 'shipped_parcel', 'low_risk_shipped', 'do_not_ship'
   
   // Clean file name
   const sourceNameEscaped = sourceName.replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -538,6 +540,7 @@ function appendResultRow(sourceName, data) {
 function appendErrorRow(sourceName, errorMsg) {
   const tr = document.createElement('tr');
   tr.style.borderBottom = '1px solid var(--b1); background: rgba(229,62,62,0.02);';
+  tr.dataset.recommendation = 'do_not_ship'; // failures are high risk
   const nameEsc = sourceName.replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const errEsc = errorMsg.replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -571,6 +574,52 @@ btnResetVerifier.addEventListener('click', () => {
   inpAddress.value = '';
   inpAddress.focus();
 });
+
+// Interactive Table Filtering
+let currentFilter = 'all';
+
+function applyFilter(filter) {
+  currentFilter = filter;
+  
+  // Update badge active styles
+  batchTotalBadge.classList.remove('active-filter');
+  batchPassBadge.classList.remove('active-filter');
+  batchFailBadge.classList.remove('active-filter');
+  
+  if (filter === 'all') {
+    batchTotalBadge.classList.add('active-filter');
+  } else if (filter === 'safe') {
+    batchPassBadge.classList.add('active-filter');
+  } else if (filter === 'high_risk') {
+    batchFailBadge.classList.add('active-filter');
+  }
+  
+  // Show/hide rows based on filter selection
+  const rows = verifierBatchTbody.querySelectorAll('tr');
+  rows.forEach(row => {
+    const rec = row.dataset.recommendation;
+    if (filter === 'all') {
+      row.classList.remove('hidden');
+    } else if (filter === 'safe') {
+      if (rec === 'shipped_parcel' || rec === 'low_risk_shipped') {
+        row.classList.remove('hidden');
+      } else {
+        row.classList.add('hidden');
+      }
+    } else if (filter === 'high_risk') {
+      if (rec === 'do_not_ship') {
+        row.classList.remove('hidden');
+      } else {
+        row.classList.add('hidden');
+      }
+    }
+  });
+}
+
+// Add event listeners for filter badges
+batchTotalBadge.addEventListener('click', () => applyFilter('all'));
+batchPassBadge.addEventListener('click', () => applyFilter('safe'));
+batchFailBadge.addEventListener('click', () => applyFilter('high_risk'));
 
 
 // ── Toast Notifications ─────────────────────────────────────────────────────
