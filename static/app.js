@@ -468,6 +468,20 @@ function appendResultRow(sourceName, data) {
   const courierEscaped = (data.courier_name || '—').replace(/</g, "&lt;").replace(/>/g, "&gt;");
   const hubCellHtml = `<strong>${hubEscaped}</strong><br><span style="font-size:11px; color:var(--t3);">${courierEscaped}</span>`;
 
+  // Map Link Cell
+  let mapCellHtml = "—";
+  if (data.google_maps_link) {
+    mapCellHtml = `
+      <a href="${data.google_maps_link}" target="_blank" style="color: var(--gold-1); display: inline-flex; align-items: center; gap: 6px; text-decoration: none; font-weight: 700; transition: var(--t);" class="map-link-btn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Verify Map
+      </a>
+    `;
+  }
+
   // Recommendation Badge
   let recHtml = "";
   if (data.recommendation === 'shipped_parcel') {
@@ -496,6 +510,7 @@ function appendResultRow(sourceName, data) {
     <td style="padding: 12px 16px; font-family: var(--mono);">${pinCellHtml}</td>
     <td style="padding: 12px 16px; font-size: 12px;">${matchCellHtml}</td>
     <td style="padding: 12px 16px; font-size: 12px;">${hubCellHtml}</td>
+    <td style="padding: 12px 16px; font-size: 12px; white-space: nowrap;">${mapCellHtml}</td>
     <td style="padding: 12px 16px;">${recHtml}</td>
     <td style="padding: 12px 16px; font-size: 12px; max-width: 300px;">${reasonHtml}</td>
   `;
@@ -511,7 +526,7 @@ function appendErrorRow(sourceName, errorMsg) {
 
   tr.innerHTML = `
     <td style="padding: 12px 16px; font-weight: 600; color: var(--error);">${nameEsc}</td>
-    <td style="padding: 12px 16px; color: var(--error);" colspan="4">Processing Failed</td>
+    <td style="padding: 12px 16px; color: var(--error);" colspan="5">Processing Failed</td>
     <td style="padding: 12px 16px;"><span style="color: var(--error); background: var(--error-bg); border: 1px solid rgba(229,62,62,0.3); padding: 3px 8px; border-radius: 99px; font-weight: 700; font-size:11px; display:inline-flex; align-items:center; gap:5px;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>Do not shipped this address</span></td>
     <td style="padding: 12px 16px; font-size: 12.5px; color: #ffb3c0;">${errEsc}</td>
   `;
