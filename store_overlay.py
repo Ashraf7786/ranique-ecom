@@ -335,27 +335,16 @@ def add_store_strip(
 ) -> bytes:
     """
     Stamps a store branding strip into the bottom free space of the PDF.
-    Scales the original label content down to guarantee zero layout overlaps.
+    Original label content is NEVER modified. Stamped on each page of the PDF.
     """
     doc = fitz.open(stream=pdf_bytes, filetype='pdf')
-    new_doc = fitz.open()
     
     # Pre-generate QR code bytes once for maximum performance across multi-page labels
     qr_png_bytes = _make_qr_png(store_link, size_px=300)
     
     for page in doc:
-        # Determine target dimensions
-        if convert_4x6:
-            W, H = 288, 432
-        else:
-            W, H = page.rect.width, page.rect.height
-            
-        new_page = new_doc.new_page(width=W, height=H)
-        
-        # ── Collision Guard: Scale original label content down to fit above the strip ──
-        # Branding strip takes STRIP_HEIGHT + STRIP_MARGIN = 70 points
-        label_rect = fitz.Rect(0, 0, W, H - STRIP_HEIGHT - STRIP_MARGIN)
-        new_page.show_pdf_page(label_rect, doc, page.number, keep_proportion=True)
+        W    = page.rect.width
+        H    = page.rect.height
  
         # ── Strip boundary ────────────────────────────────────────────────────
         sx0 = STRIP_MARGIN
@@ -367,8 +356,8 @@ def add_store_strip(
         inner   = 4   # inner padding
  
         # Rounded white background + black border
-        new_page.draw_rect(strip, color=COLOR_BLACK, fill=COLOR_WHITE,
-                           width=BORDER_WIDTH, radius=RADIUS)
+        page.draw_rect(strip, color=COLOR_BLACK, fill=COLOR_WHITE,
+                       width=BORDER_WIDTH, radius=RADIUS)
  
         # ── Column split: 55% left (icon+name)  |  45% right (QR+text) ───────
         total_w  = sx1 - sx0
@@ -377,15 +366,15 @@ def add_store_strip(
         right_x1 = sx1
  
         # Vertical divider
-        new_page.draw_line(fitz.Point(right_x0, sy0 + inner),
-                           fitz.Point(right_x0, sy1 - inner),
-                           color=COLOR_GREY, width=0.8)
+        page.draw_line(fitz.Point(right_x0, sy0 + inner),
+                       fitz.Point(right_x0, sy1 - inner),
+                       color=COLOR_GREY, width=0.8)
  
         # ══ LEFT: icon  +  store name ════════════════════════════════════════
         icon_size = strip_h - inner * 2
         icon_x0   = sx0 + inner
         icon_y0   = sy0 + inner
-        _draw_icon(new_page, fitz.Rect(icon_x0, icon_y0,
+        _draw_icon(page, fitz.Rect(icon_x0, icon_y0,
                                    icon_x0 + icon_size, icon_y0 + icon_size), shop_icon)
  
         # Store name — to the right of icon, Jakarta Sans Bold, auto-size
@@ -403,10 +392,10 @@ def add_store_strip(
         name_x = (name_x0 + name_x1) / 2 - tw / 2          # horizontally centred
         name_y = (sy0 + sy1) / 2 + fs * 0.35                # vertically centred
  
-        _insert(new_page, fitz.Point(name_x, name_y), store_name, fs, bold=True)
+        _insert(page, fitz.Point(name_x, name_y), store_name, fs, bold=True)
  
         # Underline
-        new_page.draw_line(fitz.Point(name_x, name_y + 3),
+        page.draw_line(fitz.Point(name_x, name_y + 3),
                        fitz.Point(name_x + tw, name_y + 3),
                        color=COLOR_BLACK, width=1.2)
  
@@ -417,7 +406,7 @@ def add_store_strip(
         qr_x    = right_x0 + qr_pad
         qr_y    = sy0 + qr_pad
         qr_rect = fitz.Rect(qr_x, qr_y, qr_x + qr_size, qr_y + qr_size)
-        new_page.insert_image(qr_rect, stream=qr_png_bytes)
+        page.insert_image(qr_rect, stream=qr_png_bytes)
  
         # Follow text — RIGHT of QR, vertically centred, Jakarta Sans Bold (size 11 to avoid clashing)
         cap_fs    = 11.0
@@ -431,7 +420,7 @@ def add_store_strip(
             fp = _font_path(bold=True, semi=False)
             if fp:
                 try:
-                    new_page.insert_text(
+                    page.insert_text(
                         fitz.Point(text_x, ty_start + i * (cap_fs + 3)),
                         line,
                         fontfile=fp,
@@ -442,7 +431,16 @@ def add_store_strip(
                     continue
                 except Exception:
                     pass
-            _insert(new_page, fitz.Point(text_x, ty_start + i * (cap_fs + 3)),
+            _insert(page, fitz.Point(text_x, ty_start + i * (cap_fs + 3)),
                     line, cap_fs, bold=True)
  
-    return new_doc.tobytes()
+    if convert_4x6:
+        # Scale to standard 4x6 inches (288 x 432 points) for direct thermal printing
+        new_doc = fitz.open()
+        for page in doc:
+            new_page = new_doc.new_page(width=288, height=432)
+            tgt_rect = fitz.Rect(0, 0, 288, 432)
+            new_page.show_pdf_page(tgt_rect, doc, page.number, keep_proportion=True)
+        return new_doc.tobytes()
+ 
+    return doc.tobytes()
