@@ -692,4 +692,31 @@ toastClose.addEventListener('click', () => {
   clearTimeout(toastTimer);
 });
 
+// Theme Switcher & Persistence
+const themeToggleBtn = $('theme-toggle');
+const sunIcon        = themeToggleBtn.querySelector('.sun-icon');
+const moonIcon       = themeToggleBtn.querySelector('.moon-icon');
+
+function setTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('theme', theme);
+  
+  if (theme === 'dark') {
+    sunIcon.classList.remove('hidden');
+    moonIcon.classList.add('hidden');
+  } else {
+    sunIcon.classList.add('hidden');
+    moonIcon.classList.remove('hidden');
+  }
+}
+
+// Initial theme setup
+const savedTheme = localStorage.getItem('theme') || 'light';
+setTheme(savedTheme);
+
+themeToggleBtn.addEventListener('click', () => {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+});
+
 
