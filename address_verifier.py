@@ -330,21 +330,26 @@ def verify_indian_address(address_text: str):
         # If everything is perfect
         if result["state_match"] is not False and result["district_match"] is not False:
             result["recommendation"] = "shipped_parcel"
-            result["recommendation_text"] = "Shipped this parcel"
+            result["recommendation_text"] = "Safe to Ship"
             result["message"] = "Address details match official records. Deliverable."
-        # If minor warning but pincode is registered (e.g. spelling city or missing state name)
-        elif len(result["detailed_reasons"]) <= 1:
-            result["recommendation"] = "low_risk_shipped"
-            result["recommendation_text"] = "Confusion / Low Risk - Shipped this parcel"
-            result["message"] = "Minor address warnings detected, but Pincode is registered."
-        else:
-            # Major mismatches
+        # Explicit state mismatch: highly critical (do not ship)
+        elif state_found and result["state_match"] is False:
             result["recommendation"] = "do_not_ship"
-            result["recommendation_text"] = "Do not shipped this address"
+            result["recommendation_text"] = "Do Not Ship: State Mismatch"
+            result["message"] = f"Explicit state mismatch: Address specifies '{state_found}' but PIN belongs to {result['official_state']}."
+        # Both state and district are incorrect/missing
+        elif result["state_match"] is False and result["district_match"] is False:
+            result["recommendation"] = "do_not_ship"
+            result["recommendation_text"] = "Do Not Ship: Multiple Address Failures"
             result["message"] = "Critical address errors detected. High risk of RTO."
+        # Minor warning (e.g. spelling of city or missing state name)
+        else:
+            result["recommendation"] = "low_risk_shipped"
+            result["recommendation_text"] = "Low Risk Warning"
+            result["message"] = "Minor address warnings detected, but Pincode is registered."
     else:
         result["recommendation"] = "do_not_ship"
-        result["recommendation_text"] = "Do not shipped this address"
+        result["recommendation_text"] = "Do Not Ship: Invalid PIN"
 
     # Suggested formatting
     if result["pincode_valid"] and (result["state_match"] is False or result["district_match"] is False):
