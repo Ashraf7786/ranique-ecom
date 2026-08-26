@@ -246,6 +246,62 @@ body{
 .theme-toggle-btn:hover svg {
   transform: rotate(15deg);
 }
+
+/* ── Header Actions Links ───────────────────────────────────────── */
+.action-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--t2);
+  background: var(--bg-3);
+  border: 1px solid var(--b1);
+  padding: 8px 14px;
+  border-radius: 99px;
+  text-decoration: none;
+  transition: var(--t);
+  white-space: nowrap;
+}
+.action-link:hover {
+  border-color: var(--b-gold);
+  color: var(--gold-1);
+  background: var(--gold-dim);
+  transform: translateY(-1px);
+}
+.action-link:active {
+  transform: translateY(0);
+}
+.action-link svg {
+  color: var(--gold-1);
+  flex-shrink: 0;
+}
+.action-link-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid var(--b1);
+  color: var(--t2);
+  transition: var(--t);
+  background: var(--bg-3);
+  text-decoration: none;
+}
+.action-link-icon:hover {
+  border-color: var(--b-gold);
+  color: var(--gold-1);
+  background: var(--gold-dim);
+  transform: translateY(-1px);
+}
+.action-link-icon:active {
+  transform: translateY(0);
+}
+.action-link-icon svg {
+  flex-shrink: 0;
+}
+
 .header-inner{
   max-width:1100px;margin:0 auto;
   padding:12px 28px;
@@ -966,6 +1022,12 @@ body{
     position: absolute;
     top: 14px;
     right: 16px;
+  }
+  .action-link {
+    display: none !important;
+  }
+  .action-link-icon {
+    display: none !important;
   }
   .header-badges {
     display: none !important;
