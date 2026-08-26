@@ -5,8 +5,84 @@ import logging
 import os
 import subprocess
 import pymupdf as fitz
+import sqlite3
 
 log = logging.getLogger(__name__)
+
+# ══════════════════════════════════════════════════════════════════════════
+# SQLite Persistent Cache Layer
+# ══════════════════════════════════════════════════════════════════════════
+
+class SQLiteCache:
+    def __init__(self, db_path='cache.db'):
+        self.db_path = db_path
+        self._init_db()
+
+    def _init_db(self):
+        os.makedirs(os.path.dirname(os.path.abspath(self.db_path)), exist_ok=True)
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS pincodes (
+                        pincode TEXT PRIMARY KEY,
+                        data TEXT,
+                        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                conn.execute("""
+                    CREATE TABLE IF NOT EXISTS ocr_results (
+                        image_hash TEXT PRIMARY KEY,
+                        extracted_text TEXT,
+                        timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+                    )
+                """)
+                conn.commit()
+        except Exception as exc:
+            log.error(f"Failed to initialize SQLite cache database: {exc}")
+
+    def get_pincode(self, pincode):
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT data FROM pincodes WHERE pincode = ?", (pincode,))
+                row = cursor.fetchone()
+                if row:
+                    return json.loads(row[0])
+        except Exception as exc:
+            log.error(f"Error reading pincode from sqlite cache: {exc}")
+        return None
+
+    def set_pincode(self, pincode, data):
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("INSERT OR REPLACE INTO pincodes (pincode, data) VALUES (?, ?)",
+                             (pincode, json.dumps(data)))
+                conn.commit()
+        except Exception as exc:
+            log.error(f"Error writing pincode to sqlite cache: {exc}")
+
+    def get_ocr(self, image_hash):
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT extracted_text FROM ocr_results WHERE image_hash = ?", (image_hash,))
+                row = cursor.fetchone()
+                if row:
+                    return row[0]
+        except Exception as exc:
+            log.error(f"Error reading OCR from sqlite cache: {exc}")
+        return None
+
+    def set_ocr(self, image_hash, extracted_text):
+        try:
+            with sqlite3.connect(self.db_path) as conn:
+                conn.execute("INSERT OR REPLACE INTO ocr_results (image_hash, extracted_text) VALUES (?, ?)",
+                             (image_hash, extracted_text))
+                conn.commit()
+        except Exception as exc:
+            log.error(f"Error writing OCR to sqlite cache: {exc}")
+
+db_cache = SQLiteCache()
 
 # Basic lists of Indian states and union territories for normalization
 STATES_MAP = {
@@ -247,15 +323,24 @@ def verify_indian_address(address_text: str):
     cleaned_address = clean_string(address_text)
 
     # 2. Query postal pincode API
-    url = f"https://api.postalpincode.in/pincode/{pincode}"
-    try:
-        req = urllib.request.Request(
-            url, 
-            headers={'User-Agent': 'Mozilla/5.0'}
-        )
-        with urllib.request.urlopen(req, timeout=5) as response:
-            data = json.loads(response.read().decode('utf-8'))
+    pincode_data = db_cache.get_pincode(pincode)
+    
+    if not pincode_data:
+        url = f"https://api.postalpincode.in/pincode/{pincode}"
+        try:
+            req = urllib.request.Request(
+                url, 
+                headers={'User-Agent': 'Mozilla/5.0'}
+            )
+            with urllib.request.urlopen(req, timeout=5) as response:
+                pincode_data = json.loads(response.read().decode('utf-8'))
+                db_cache.set_pincode(pincode, pincode_data)
+        except Exception as e:
+            log.error(f"Error fetching PIN code data: {e}")
             
+    if pincode_data:
+        try:
+            data = pincode_data
             if data and data[0]["Status"] == "Success":
                 post_offices = data[0]["PostOffice"]
                 if post_offices:
@@ -276,9 +361,12 @@ def verify_indian_address(address_text: str):
                 query = urllib.parse.quote(address_text)
                 result["google_maps_link"] = f"https://www.google.com/maps/search/?api=1&query={query}"
                 return result
-    except Exception as e:
-        log.error(f"Error fetching PIN code data: {e}")
-        # Local fallback heuristic if API is down
+        except Exception as parse_err:
+            log.error(f"Error parsing pincode data: {parse_err}")
+            result["pincode_valid"] = True
+            result["message"] = "Postal database issue. Local rules applied."
+    else:
+        # Local fallback heuristic if API is down and no cache exists
         result["pincode_valid"] = True
         result["message"] = "Postal database offline. Local rules applied."
 

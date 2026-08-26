@@ -80,7 +80,8 @@ def api_verify_address():
     from address_verifier import (
         verify_indian_address, 
         run_local_ocr, 
-        extract_address_and_hub
+        extract_address_and_hub,
+        db_cache
     )
     import pymupdf as fitz
 
@@ -117,7 +118,19 @@ def api_verify_address():
                             try:
                                 pix = page.get_pixmap(dpi=150)
                                 pix.save(temp_path)
-                                page_text = run_local_ocr(temp_path)
+                                
+                                import hashlib
+                                with open(temp_path, 'rb') as f:
+                                    img_bytes = f.read()
+                                    img_hash = hashlib.sha256(img_bytes).hexdigest()
+                                
+                                cached_text = db_cache.get_ocr(img_hash)
+                                if cached_text:
+                                    log.info("OCR cache hit for page %d", page_num + 1)
+                                    page_text = cached_text
+                                else:
+                                    page_text = run_local_ocr(temp_path)
+                                    db_cache.set_ocr(img_hash, page_text)
                             except Exception as ocr_err:
                                 log.error("OCR rendering/processing failed for page %d: %s", page_num + 1, ocr_err)
                             finally:
@@ -145,7 +158,19 @@ def api_verify_address():
                 temp_path = os.path.join('temp', f"ocr_{file.filename}")
                 file.save(temp_path)
                 try:
-                    extracted_text = run_local_ocr(temp_path)
+                    import hashlib
+                    with open(temp_path, 'rb') as f:
+                        img_bytes = f.read()
+                        img_hash = hashlib.sha256(img_bytes).hexdigest()
+                    
+                    cached_text = db_cache.get_ocr(img_hash)
+                    if cached_text:
+                        log.info("OCR cache hit for uploaded image %s", file.filename)
+                        extracted_text = cached_text
+                    else:
+                        extracted_text = run_local_ocr(temp_path)
+                        db_cache.set_ocr(img_hash, extracted_text)
+                        
                     address_to_verify, delivery_hub, courier_name = extract_address_and_hub(extracted_text)
                     report = verify_indian_address(address_to_verify)
                     report['file_used'] = True
