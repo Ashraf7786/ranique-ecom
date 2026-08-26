@@ -708,6 +708,37 @@ body{
   background:var(--gold-dim);
 }
 
+/* ── Icon Selector ─────────────────────────────────────────────── */
+.icon-selector {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-top: 4px;
+}
+.icon-option {
+  height: 40px;
+  border-radius: 8px;
+  background: var(--bg-3);
+  border: 1px solid var(--b1);
+  color: var(--t2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--t);
+}
+.icon-option:hover {
+  border-color: var(--b-gold);
+  color: var(--gold-1);
+  background: var(--gold-dim);
+}
+.icon-option.selected {
+  border-color: var(--gold-1);
+  background: var(--gold-glow);
+  color: var(--gold-1);
+  box-shadow: var(--shadow-input);
+}
+
 /* ── CTA ───────────────────────────────────────────────────────── */
 .form-cta{
   padding:28px 36px 32px;

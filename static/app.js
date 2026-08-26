@@ -151,7 +151,11 @@ function validate() {
 }
 
 inpLink.addEventListener('input', validate);
-inpName.addEventListener('input', validate);
+const lpStoreName = document.querySelector('.lp-store-name');
+inpName.addEventListener('input', () => {
+  lpStoreName.textContent = inpName.value.trim().toUpperCase() || 'RANIQUE LIFESTYLE';
+  validate();
+});
 
 let stampedPdfBlobUrl = null;
 
@@ -169,6 +173,7 @@ btnStamp.addEventListener('click', async () => {
   fd.append('store_link', link);
   fd.append('store_name', name);
   fd.append('convert_4x6', convert4x6);
+  fd.append('shop_icon',   document.getElementById('inp-icon-type').value);
 
   loading.classList.remove('hidden');
   successCard.classList.add('hidden');
@@ -717,6 +722,28 @@ setTheme(savedTheme);
 themeToggleBtn.addEventListener('click', () => {
   const currentTheme = document.documentElement.getAttribute('data-theme');
   setTheme(currentTheme === 'dark' ? 'light' : 'dark');
+});
+
+// Icon Picker Selection & Preview Update
+const iconOptions       = document.querySelectorAll('.icon-option');
+const inpIconType       = $('inp-icon-type');
+const previewStripIcon  = $('preview-strip-icon');
+
+iconOptions.forEach(opt => {
+  opt.addEventListener('click', () => {
+    // Remove selected class from all options
+    iconOptions.forEach(o => o.classList.remove('selected'));
+    
+    // Add selected class to the clicked option
+    opt.classList.add('selected');
+    
+    // Update hidden input type
+    const iconType = opt.dataset.icon;
+    inpIconType.value = iconType;
+    
+    // Update preview mockup icon instantly
+    previewStripIcon.innerHTML = opt.innerHTML;
+  });
 });
 
 

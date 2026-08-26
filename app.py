@@ -47,13 +47,14 @@ def api_stamp():
 
     store_name = (request.form.get('store_name') or 'RANIQUE LIFESTYLE').strip()
     convert_4x6 = request.form.get('convert_4x6', 'false').lower() == 'true'
+    shop_icon = (request.form.get('shop_icon') or 'shop').strip()
 
     pdf_bytes = file.read()
-    log.info('Stamping PDF (%d bytes) with link=%s name=%s convert_4x6=%s',
-             len(pdf_bytes), store_link, store_name, convert_4x6)
+    log.info('Stamping PDF (%d bytes) with link=%s name=%s convert_4x6=%s icon=%s',
+             len(pdf_bytes), store_link, store_name, convert_4x6, shop_icon)
 
     try:
-        result = add_store_strip(pdf_bytes, store_link, store_name, convert_4x6=convert_4x6)
+        result = add_store_strip(pdf_bytes, store_link, store_name, convert_4x6=convert_4x6, shop_icon=shop_icon)
     except Exception as exc:
         log.exception('Overlay failed')
         return jsonify({'error': f'Failed to add store strip: {exc}'}), 500

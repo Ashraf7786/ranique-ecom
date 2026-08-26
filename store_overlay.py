@@ -13,6 +13,7 @@ Uses PyMuPDF + Plus Jakarta Sans (auto-downloaded on first run).
 import io
 import os
 import urllib.request
+import math
 import pymupdf as fitz
 import qrcode
 from PIL import Image as PILImage
@@ -141,15 +142,14 @@ def _make_qr_png(url: str, size_px: int = 300) -> bytes:
 # Store / shop icon  (drawn with PyMuPDF primitives)
 # ══════════════════════════════════════════════════════════════════════════
 
-def _draw_store_icon(page: fitz.Page, rect: fitz.Rect) -> None:
+def _draw_icon(page: fitz.Page, rect: fitz.Rect, icon_type: str) -> None:
     """
-    Draws a clean storefront icon:  awning (striped) + scallop + body + door.
-    Sized and centred inside *rect*.
+    Draws one of 10 modern storefront/shop icons inside *rect*.
     """
     x0, y0, x1, y1 = rect.x0, rect.y0, rect.x1, rect.y1
-    pad    = 3
+    pad = 3
     icon_w = min((x1 - x0) - pad * 2, (y1 - y0) - pad * 2)
-    icon_h = icon_w * 1.05
+    icon_h = icon_w
     cx = (x0 + x1) / 2
     cy = (y0 + y1) / 2
     ix0 = cx - icon_w / 2
@@ -158,51 +158,167 @@ def _draw_store_icon(page: fitz.Page, rect: fitz.Rect) -> None:
     iy1 = cy + icon_h / 2
     lw = 1.1
 
-    # ── Awning ──────────────────────────────────────────────────────
-    aw_h  = icon_h * 0.30
-    aw_y0 = iy0
-    aw_y1 = iy0 + aw_h
-    sw    = icon_w / 5
-    for i in range(5):
-        sx   = ix0 + i * sw
-        fill = COLOR_GREY if i % 2 == 0 else COLOR_LIGHT
-        page.draw_rect(fitz.Rect(sx, aw_y0, sx + sw, aw_y1),
-                       color=fill, fill=fill, width=0.1)
-    page.draw_rect(fitz.Rect(ix0, aw_y0, ix1, aw_y1),
-                   color=COLOR_BLACK, fill=None, width=lw)
+    if icon_type == 'shop':
+        # storefront icon
+        # Awning
+        aw_h  = icon_h * 0.30
+        aw_y0 = iy0
+        aw_y1 = iy0 + aw_h
+        sw    = icon_w / 5
+        for i in range(5):
+            sx   = ix0 + i * sw
+            fill = COLOR_GREY if i % 2 == 0 else COLOR_LIGHT
+            page.draw_rect(fitz.Rect(sx, aw_y0, sx + sw, aw_y1),
+                           color=fill, fill=fill, width=0.1)
+        page.draw_rect(fitz.Rect(ix0, aw_y0, ix1, aw_y1),
+                       color=COLOR_BLACK, fill=None, width=lw)
 
-    # ── Scalloped awning bottom ──────────────────────────────────────
-    zz_w = icon_w / 5
-    zz_h = aw_h * 0.24
-    pts  = [fitz.Point(ix0, aw_y1)]
-    for i in range(5):
-        pts.append(fitz.Point(ix0 + (i + 0.5) * zz_w, aw_y1 + zz_h))
-        pts.append(fitz.Point(ix0 + (i + 1.0) * zz_w, aw_y1))
-    page.draw_polyline(pts, color=COLOR_BLACK, width=lw)
+        # Scalloped bottom
+        zz_w = icon_w / 5
+        zz_h = aw_h * 0.24
+        pts  = [fitz.Point(ix0, aw_y1)]
+        for i in range(5):
+            pts.append(fitz.Point(ix0 + (i + 0.5) * zz_w, aw_y1 + zz_h))
+            pts.append(fitz.Point(ix0 + (i + 1.0) * zz_w, aw_y1))
+        page.draw_polyline(pts, color=COLOR_BLACK, width=lw)
 
-    # ── Store body ───────────────────────────────────────────────────
-    body_y0 = aw_y1 + zz_h
-    body_h  = iy1 - body_y0
-    page.draw_rect(fitz.Rect(ix0, body_y0, ix1, iy1),
-                   color=COLOR_BLACK, fill=COLOR_WHITE, width=lw)
+        # Store body
+        body_y0 = aw_y1 + zz_h
+        body_h  = iy1 - body_y0
+        page.draw_rect(fitz.Rect(ix0, body_y0, ix1, iy1),
+                       color=COLOR_BLACK, fill=COLOR_WHITE, width=lw)
 
-    # Sign board
-    sw2   = icon_w * 0.58
-    sh    = body_h * 0.18
-    sx2   = cx - sw2 / 2
-    sy2   = body_y0 + body_h * 0.10
-    page.draw_rect(fitz.Rect(sx2, sy2, sx2 + sw2, sy2 + sh),
-                   color=COLOR_BLACK, fill=COLOR_LIGHT, width=lw * 0.6)
+        # Signboard
+        sw2   = icon_w * 0.58
+        sh    = body_h * 0.18
+        sx2   = cx - sw2 / 2
+        sy2   = body_y0 + body_h * 0.10
+        page.draw_rect(fitz.Rect(sx2, sy2, sx2 + sw2, sy2 + sh),
+                       color=COLOR_BLACK, fill=COLOR_LIGHT, width=lw * 0.6)
 
-    # Door
-    dw  = icon_w * 0.34
-    dh  = body_h * 0.52
-    dx0 = cx - dw / 2
-    dy0 = iy1 - dh
-    page.draw_rect(fitz.Rect(dx0, dy0, dx0 + dw, iy1),
-                   color=COLOR_BLACK, fill=COLOR_LIGHT, width=lw * 0.8)
-    page.draw_circle(fitz.Point(dx0 + dw * 0.28, dy0 + dh * 0.55),
-                     lw * 0.9, color=COLOR_BLACK, fill=COLOR_BLACK)
+        # Door
+        dw  = icon_w * 0.34
+        dh  = body_h * 0.52
+        dx0 = cx - dw / 2
+        dy0 = iy1 - dh
+        page.draw_rect(fitz.Rect(dx0, dy0, dx0 + dw, iy1),
+                       color=COLOR_BLACK, fill=COLOR_LIGHT, width=lw * 0.8)
+        page.draw_circle(fitz.Point(dx0 + dw * 0.28, dy0 + dh * 0.55),
+                         lw * 0.9, color=COLOR_BLACK, fill=COLOR_BLACK)
+
+    elif icon_type == 'bag':
+        # Shopping Bag
+        # Handle
+        handle_y = iy0 + icon_h * 0.25
+        page.draw_circle(fitz.Point(cx, handle_y), icon_w * 0.20, color=COLOR_BLACK, fill=None, width=lw)
+        # Body cover-up
+        page.draw_rect(fitz.Rect(ix0, handle_y, ix1, iy1), color=COLOR_WHITE, fill=COLOR_WHITE, width=0)
+        # Bag Body
+        page.draw_rect(fitz.Rect(ix0, handle_y, ix1, iy1), color=COLOR_BLACK, fill=None, width=lw, radius=0.1)
+
+    elif icon_type == 'cart':
+        # Shopping Cart
+        # Basket
+        by0 = iy0 + icon_h * 0.10
+        by1 = iy1 - icon_h * 0.30
+        bx0 = ix0 + icon_w * 0.15
+        bx1 = ix1 - icon_w * 0.05
+        page.draw_rect(fitz.Rect(bx0, by0, bx1, by1), color=COLOR_BLACK, fill=None, width=lw)
+        
+        # Handle and legs
+        page.draw_polyline([
+            fitz.Point(ix0, by0),
+            fitz.Point(bx0, by0),
+            fitz.Point(bx0, by1 + 4),
+            fitz.Point(bx1 - 4, by1 + 4)
+        ], color=COLOR_BLACK, width=lw)
+        
+        # Wheels
+        wheel_r = icon_h * 0.10
+        page.draw_circle(fitz.Point(bx0 + 4, iy1 - wheel_r), wheel_r, color=COLOR_BLACK, fill=COLOR_BLACK)
+        page.draw_circle(fitz.Point(bx1 - 6, iy1 - wheel_r), wheel_r, color=COLOR_BLACK, fill=COLOR_BLACK)
+
+    elif icon_type == 'star':
+        # Premium Star
+        pts = []
+        for i in range(10):
+            r = (icon_w / 2) if i % 2 == 0 else (icon_w / 4)
+            angle = i * math.pi / 5 - math.pi / 2
+            pts.append(fitz.Point(cx + r * math.cos(angle), cy + r * math.sin(angle)))
+        pts.append(pts[0])
+        page.draw_polyline(pts, color=COLOR_BLACK, fill=COLOR_LIGHT, width=lw)
+
+    elif icon_type == 'tag':
+        # Price Tag
+        tx0 = ix0 + icon_w * 0.15
+        tx1 = ix1 - icon_w * 0.15
+        ty0 = iy0 + icon_h * 0.15
+        ty1 = iy1 - icon_h * 0.15
+        page.draw_polyline([
+            fitz.Point(cx, ty0),
+            fitz.Point(tx1, ty0 + 8),
+            fitz.Point(tx1, ty1),
+            fitz.Point(tx0, ty1),
+            fitz.Point(tx0, ty0 + 8),
+            fitz.Point(cx, ty0)
+        ], color=COLOR_BLACK, fill=None, width=lw)
+        page.draw_circle(fitz.Point(cx, ty0 + 6), 1.5, color=COLOR_BLACK, fill=COLOR_BLACK)
+
+    elif icon_type == 'box':
+        # Package / Box
+        page.draw_rect(fitz.Rect(ix0, iy0, ix1, iy1), color=COLOR_BLACK, fill=COLOR_WHITE, width=lw)
+        page.draw_line(fitz.Point(cx, iy0), fitz.Point(cx, iy1), color=COLOR_BLACK, width=lw * 1.5)
+        page.draw_line(fitz.Point(ix0, cy), fitz.Point(ix1, cy), color=COLOR_BLACK, width=lw * 0.5)
+
+    elif icon_type == 'truck':
+        # Delivery Truck
+        ty0 = iy0 + icon_h * 0.15
+        ty1 = iy1 - icon_h * 0.20
+        cab_w = icon_w * 0.30
+        page.draw_rect(fitz.Rect(ix1 - cab_w, cy - 2, ix1, ty1), color=COLOR_BLACK, fill=COLOR_LIGHT, width=lw)
+        page.draw_rect(fitz.Rect(ix0, ty0, ix1 - cab_w - 2, ty1), color=COLOR_BLACK, fill=COLOR_WHITE, width=lw)
+        wheel_r = icon_h * 0.10
+        page.draw_circle(fitz.Point(ix0 + icon_w * 0.25, ty1 + 2), wheel_r, color=COLOR_BLACK, fill=COLOR_BLACK)
+        page.draw_circle(fitz.Point(ix1 - icon_w * 0.25, ty1 + 2), wheel_r, color=COLOR_BLACK, fill=COLOR_BLACK)
+
+    elif icon_type == 'crown':
+        # Premium Crown
+        cy0 = iy0 + icon_h * 0.20
+        page.draw_polyline([
+            fitz.Point(ix0, iy1),
+            fitz.Point(ix0 + 2, cy0),
+            fitz.Point(ix0 + icon_w * 0.3, cy - 2),
+            fitz.Point(cx, cy0 - 4),
+            fitz.Point(ix1 - icon_w * 0.3, cy - 2),
+            fitz.Point(ix1 - 2, cy0),
+            fitz.Point(ix1, iy1),
+            fitz.Point(ix0, iy1)
+        ], color=COLOR_BLACK, fill=COLOR_LIGHT, width=lw)
+        page.draw_circle(fitz.Point(ix0 + 2, cy0), 1.2, color=COLOR_BLACK, fill=COLOR_BLACK)
+        page.draw_circle(fitz.Point(cx, cy0 - 4), 1.2, color=COLOR_BLACK, fill=COLOR_BLACK)
+        page.draw_circle(fitz.Point(ix1 - 2, cy0), 1.2, color=COLOR_BLACK, fill=COLOR_BLACK)
+
+    elif icon_type == 'sparkles':
+        # Sparkles / Trendy
+        page.draw_polyline([
+            fitz.Point(cx, iy0), fitz.Point(cx + 3, cy - 3),
+            fitz.Point(ix1, cy), fitz.Point(cx + 3, cy + 3),
+            fitz.Point(cx, iy1), fitz.Point(cx - 3, cy + 3),
+            fitz.Point(ix0, cy), fitz.Point(cx - 3, cy - 3),
+            fitz.Point(cx, iy0)
+        ], color=COLOR_BLACK, fill=COLOR_BLACK, width=lw)
+        scx = ix1 - 3
+        scy = iy0 + 3
+        page.draw_circle(fitz.Point(scx, scy), 1.5, color=COLOR_BLACK, fill=COLOR_BLACK)
+
+    elif icon_type == 'globe':
+        # Globe / Online store
+        r = icon_w / 2
+        page.draw_circle(fitz.Point(cx, cy), r, color=COLOR_BLACK, fill=None, width=lw)
+        page.draw_line(fitz.Point(ix0, cy), fitz.Point(ix1, cy), color=COLOR_BLACK, width=lw * 0.7)
+        page.draw_line(fitz.Point(cx, iy0), fitz.Point(cx, iy1), color=COLOR_BLACK, width=lw * 0.7)
+        page.draw_circle(fitz.Point(cx - r*0.3, cy), r*1.04, color=COLOR_BLACK, fill=None, width=lw * 0.4)
+        page.draw_circle(fitz.Point(cx + r*0.3, cy), r*1.04, color=COLOR_BLACK, fill=None, width=lw * 0.4)
 
 
 # ══════════════════════════════════════════════════════════════════════════
@@ -215,6 +331,7 @@ def add_store_strip(
     store_name: str = DEFAULT_STORE_NAME,
     follow_text: str = DEFAULT_FOLLOW_TEXT,
     convert_4x6: bool = False,
+    shop_icon: str = 'shop',
 ) -> bytes:
     """
     Stamps a store branding strip into the bottom free space of the PDF.
@@ -260,8 +377,8 @@ def add_store_strip(
         icon_size = strip_h - inner * 2
         icon_x0   = sx0 + inner
         icon_y0   = sy0 + inner
-        _draw_store_icon(page, fitz.Rect(icon_x0, icon_y0,
-                                         icon_x0 + icon_size, icon_y0 + icon_size))
+        _draw_icon(page, fitz.Rect(icon_x0, icon_y0,
+                                   icon_x0 + icon_size, icon_y0 + icon_size), shop_icon)
  
         # Store name — to the right of icon, Jakarta Sans Bold, auto-size
         name_x0   = icon_x0 + icon_size + inner
